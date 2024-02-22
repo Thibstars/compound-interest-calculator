@@ -1,8 +1,7 @@
 package com.github.thibstars.cic;
 
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
+import java.time.Period;
 
 /**
  * @author Thibault Helsmoortel
@@ -14,8 +13,8 @@ public record CalculationInput(
         // Amount that you plan to add to the principal every month, or a negative number for the amount that you plan to withdraw every month
         BigDecimal monthlyContribution,
 
-        // Duration you plan to keep the investment
-        Duration investmentDuration,
+        // Period you plan to keep the investment
+        Period investmentPeriod,
 
         // The estimated annual interest rate
         double estimatedAnnualInterestRate,
@@ -24,7 +23,18 @@ public record CalculationInput(
         double interestRateVarianceRange,
 
         // Frequency at which to compound interest
-        ChronoUnit compoundFrequency
+        Frequency compoundFrequency
 ) {
 
+    @Override
+    public String toString() {
+        return "CalculationInput{" +
+                "initialInvestment=" + initialInvestment +
+                ", monthlyContribution=" + monthlyContribution +
+                ", investmentPeriod=" + investmentPeriod +
+                ", estimatedAnnualInterestRate=" + estimatedAnnualInterestRate +
+                ", interestRateVarianceRange=" + interestRateVarianceRange +
+                ", compoundFrequency=" + compoundFrequency +
+                '}';
+    }
 }
