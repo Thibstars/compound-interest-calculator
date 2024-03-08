@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +19,9 @@ public class DefaultCompoundInterestCompoundInterestCalculator implements Compou
             DefaultCompoundInterestCompoundInterestCalculator.class);
 
     @Override
-    public List<CalculationResult> calculate(CalculationInput calculationInput) {
+    public Map<BigDecimal, List<CalculationResult>> calculate(CalculationInput calculationInput) {
         LOGGER.info("Calculating compound interest for input {}", calculationInput);
 
-        List<CalculationResult> calculationResults = new ArrayList<>();
 
         Period investmentPeriod = calculationInput.investmentPeriod();
         BigDecimal periodContribution;
@@ -56,12 +56,25 @@ public class DefaultCompoundInterestCompoundInterestCalculator implements Compou
                 initialInvestment,
                 BigDecimal.ZERO
         );
-        calculationResults.add(startingPointResult);
 
-        BigDecimal interestRatePercentage = BigDecimal.valueOf(calculationInput.estimatedAnnualInterestRate()).divide(new BigDecimal("100"), MathContext.DECIMAL64);
-        calculateResults(calculationResults, interestRatePercentage, initialInvestment, BigDecimal.ZERO, periodContribution, amountOfResults);
+        Map<BigDecimal, List<CalculationResult>> allResults = Map.of(
+                calculationInput.estimatedAnnualInterestRate(), new ArrayList<>(),
+                calculationInput.estimatedAnnualInterestRate().min(calculationInput.interestRateVarianceRange()),
+                new ArrayList<>(),
+                calculationInput.estimatedAnnualInterestRate().add(calculationInput.interestRateVarianceRange()),
+                new ArrayList<>()
+        );
 
-        return calculationResults;
+        allResults.forEach((rate, results) -> {
+                    results.add(startingPointResult);
+
+                    BigDecimal interestRatePercentage = calculationInput.estimatedAnnualInterestRate()
+                            .divide(new BigDecimal("100"), MathContext.DECIMAL64);
+                    calculateResults(results, interestRatePercentage, initialInvestment, BigDecimal.ZERO, periodContribution, amountOfResults);
+                }
+        );
+
+        return allResults;
     }
 
     private void calculateResults(List<CalculationResult> calculationResults, BigDecimal interestRatePercentage, BigDecimal result, BigDecimal accruedInterest, BigDecimal periodContribution, int amountOfResultsLeft) {

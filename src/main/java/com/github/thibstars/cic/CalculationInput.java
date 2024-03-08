@@ -17,10 +17,10 @@ public record CalculationInput(
         Period investmentPeriod,
 
         // The estimated annual interest rate
-        double estimatedAnnualInterestRate,
+        BigDecimal estimatedAnnualInterestRate,
 
         // Range of interest rates (above and below the rate set in the estimatedAnnualInterestRate) for which to calculate results for
-        double interestRateVarianceRange,
+        BigDecimal interestRateVarianceRange,
 
         // Frequency at which to compound interest
         Frequency compoundFrequency
