@@ -51,6 +51,11 @@ public class DefaultCompoundInterestCompoundInterestCalculator implements Compou
             }
         }
 
+        return calculateAllResults(calculationInput, periodContribution, amountOfResults);
+    }
+
+    private Map<BigDecimal, List<CalculationResult>> calculateAllResults(CalculationInput calculationInput,
+            BigDecimal periodContribution, int amountOfResults) {
         BigDecimal initialInvestment = calculationInput.initialInvestment();
         CalculationResult startingPointResult = new CalculationResult(
                 initialInvestment,
@@ -59,18 +64,17 @@ public class DefaultCompoundInterestCompoundInterestCalculator implements Compou
 
         Map<BigDecimal, List<CalculationResult>> allResults = Map.of(
                 calculationInput.estimatedAnnualInterestRate(), new ArrayList<>(),
-                calculationInput.estimatedAnnualInterestRate().min(calculationInput.interestRateVarianceRange()),
-                new ArrayList<>(),
-                calculationInput.estimatedAnnualInterestRate().add(calculationInput.interestRateVarianceRange()),
-                new ArrayList<>()
+                calculationInput.estimatedAnnualInterestRate().subtract(calculationInput.interestRateVarianceRange()), new ArrayList<>(),
+                calculationInput.estimatedAnnualInterestRate().add(calculationInput.interestRateVarianceRange()), new ArrayList<>()
         );
 
         allResults.forEach((rate, results) -> {
                     results.add(startingPointResult);
 
-                    BigDecimal interestRatePercentage = calculationInput.estimatedAnnualInterestRate()
+                    BigDecimal interestRatePercentage = rate
                             .divide(new BigDecimal("100"), MathContext.DECIMAL64);
-                    calculateResults(results, interestRatePercentage, initialInvestment, BigDecimal.ZERO, periodContribution, amountOfResults);
+                    calculateResults(results, interestRatePercentage, initialInvestment, BigDecimal.ZERO,
+                            periodContribution, amountOfResults);
                 }
         );
 

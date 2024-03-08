@@ -4,25 +4,25 @@ Feature: Compound Interest
     Given the calculation input is:
       | initialInvestment | monthlyContribution | investmentDuration | estimatedAnnualInterestRate | interestRateVarianceRange | compoundFrequency |
       | 2500              | 25                  | 10                 | 8                           | 2                         | ANNUALLY          |
-    Then the calculation result is:
-      | result   | accruedInterest |
-      | 2500     | 0               |
-      | 3024.00  | 224.00          |
-      | 3589.92  | 489.92          |
-      | 4201.11  | 801.11          |
-      | 4861.20  | 1161.20         |
-      | 5574.10  | 1574.10         |
-      | 6344.03  | 2044.03         |
-      | 7175.55  | 2575.55         |
-      | 8073.59  | 3173.59         |
-      | 9043.48  | 3843.48         |
-      | 10090.96 | 4590.96         |
+    Then the calculation result for estimatedAnnualInterestRate 8 and interestRateVarianceRange 2 is:
+      | result   | accruedInterest | result  | accruedInterest | result   | accruedInterest |
+      | 2500     | 0               | 2500    | 0               | 2500     | 0               |
+      | 3024.00  | 224.00          | 2968.00 | 168.00          | 3080.00  | 280.00          |
+      | 3589.92  | 489.92          | 3464.08 | 364.08          | 3718.00  | 618.00          |
+      | 4201.11  | 801.11          | 3989.92 | 589.92          | 4419.80  | 1019.80         |
+      | 4861.20  | 1161.20         | 4547.32 | 847.32          | 5191.78  | 1491.78         |
+      | 5574.10  | 1574.10         | 5138.16 | 1138.16         | 6040.96  | 2040.96         |
+      | 6344.03  | 2044.03         | 5764.45 | 1464.45         | 6975.06  | 2675.06         |
+      | 7175.55  | 2575.55         | 6428.32 | 1828.32         | 8002.57  | 3402.57         |
+      | 8073.59  | 3173.59         | 7132.02 | 2232.02         | 9132.83  | 4232.83         |
+      | 9043.48  | 3843.48         | 7877.94 | 2677.94         | 10376.11 | 5176.11         |
+      | 10090.96 | 4590.96         | 8668.62 | 3168.62         | 11743.72 | 6243.72         |
 
   Scenario: Perform a calculation with semi-annual frequency
     Given the calculation input is:
       | initialInvestment | monthlyContribution | investmentDuration | estimatedAnnualInterestRate | interestRateVarianceRange | compoundFrequency |
       | 2500              | 25                  | 2                  | 8                           | 2                         | SEMI_ANNUALLY     |
-    Then the calculation result is:
+    Then the calculation result is for estimatedAnnualInterestRate 8:
       | result  | accruedInterest |
       | 2500    | 0               |
       | 2862.00 | 212.00          |
@@ -34,7 +34,7 @@ Feature: Compound Interest
     Given the calculation input is:
       | initialInvestment | monthlyContribution | investmentDuration | estimatedAnnualInterestRate | interestRateVarianceRange | compoundFrequency |
       | 2500              | 25                  | 2                  | 8                           | 2                         | QUARTERLY         |
-    Then the calculation result is:
+    Then the calculation result is for estimatedAnnualInterestRate 8:
       | result  | accruedInterest |
       | 2500    | 0               |
       | 2781.00 | 206.00          |
@@ -50,7 +50,7 @@ Feature: Compound Interest
     Given the calculation input is:
       | initialInvestment | monthlyContribution | investmentDuration | estimatedAnnualInterestRate | interestRateVarianceRange | compoundFrequency |
       | 2500              | 25                  | 2                  | 8                           | 2                         | MONTHLY           |
-    Then the calculation result is:
+    Then the calculation result is for estimatedAnnualInterestRate 8:
       | result   | accruedInterest |
       | 2500     | 0               |
       | 2727.00  | 202.00          |

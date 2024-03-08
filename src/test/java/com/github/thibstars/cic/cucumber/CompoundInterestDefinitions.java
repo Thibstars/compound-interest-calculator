@@ -9,6 +9,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import java.math.BigDecimal;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,8 +38,54 @@ public class CompoundInterestDefinitions {
         );
     }
 
-    @Then("the calculation result is:")
-    public void theCalculationResultIs(DataTable dataTable) {
+    @Then("the calculation result for estimatedAnnualInterestRate {bigdecimal} and interestRateVarianceRange {bigdecimal} is:")
+    public void theCalculationResultIs(BigDecimal estimatedAnnualInterestRate, BigDecimal interestRateVarianceRange,
+            DataTable dataTable) {
+        DefaultCompoundInterestCompoundInterestCalculator calculator = new DefaultCompoundInterestCompoundInterestCalculator();
+        Map<BigDecimal, List<CalculationResult>> actualResults = calculator.calculate(calculationInput);
+
+        List<List<String>> lines = dataTable.asLists();
+
+        BigDecimal lowerPercentage = estimatedAnnualInterestRate.subtract(interestRateVarianceRange);
+        BigDecimal upperPercentage = estimatedAnnualInterestRate.add(interestRateVarianceRange);
+        Map<BigDecimal, List<CalculationResult>> expectedResults = Map.of(
+                estimatedAnnualInterestRate, new ArrayList<>(),
+                lowerPercentage, new ArrayList<>(),
+                upperPercentage, new ArrayList<>()
+        );
+
+        lines.forEach(line -> {
+            if (RESULT_HEADER.equals(line.get(0))) {
+                return;
+            }
+
+            expectedResults.get(estimatedAnnualInterestRate).add(
+                    new CalculationResult(
+                            new BigDecimal(line.get(0)),
+                            new BigDecimal(line.get(1))
+                    )
+            );
+
+            expectedResults.get(lowerPercentage).add(
+                    new CalculationResult(
+                            new BigDecimal(line.get(2)),
+                            new BigDecimal(line.get(3))
+                    )
+            );
+
+            expectedResults.get(upperPercentage).add(
+                    new CalculationResult(
+                            new BigDecimal(line.get(4)),
+                            new BigDecimal(line.get(5))
+                    )
+            );
+        });
+
+        Assertions.assertEquals(expectedResults, actualResults);
+    }
+
+    @Then("the calculation result is for estimatedAnnualInterestRate {bigdecimal}:")
+    public void theCalculationResultIs(BigDecimal estimatedAnnualInterestRate, DataTable dataTable) {
         DefaultCompoundInterestCompoundInterestCalculator calculator = new DefaultCompoundInterestCompoundInterestCalculator();
         Map<BigDecimal, List<CalculationResult>> actualResults = calculator.calculate(calculationInput);
 
@@ -58,6 +105,6 @@ public class CompoundInterestDefinitions {
                 .filter(Objects::nonNull)
                 .toList();
 
-        Assertions.assertEquals(expectedResults, actualResults.entrySet().stream().findFirst().get().getValue());
+        Assertions.assertEquals(expectedResults, actualResults.get(estimatedAnnualInterestRate));
     }
 }
