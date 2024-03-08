@@ -25,13 +25,14 @@ public class CompoundInterestDefinitions {
     @Given("the calculation input is:")
     public void theCalculationInputIs(DataTable dataTable) {
         List<String> line = dataTable.asLists().get(1);
+        Frequency compoundFrequency = Frequency.valueOf(line.get(5));
         this.calculationInput = new CalculationInput(
                 new BigDecimal(line.get(0)),
                 new BigDecimal(line.get(1)),
                 Period.ofYears(Integer.parseInt(line.get(2))),
                 Double.parseDouble(line.get(3)),
                 Double.parseDouble(line.get(4)),
-                Frequency.valueOf(line.get(5))
+                compoundFrequency
         );
     }
 

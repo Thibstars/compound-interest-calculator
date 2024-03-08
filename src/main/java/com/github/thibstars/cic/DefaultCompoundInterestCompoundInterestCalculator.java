@@ -1,6 +1,8 @@
 package com.github.thibstars.cic;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,18 @@ public class DefaultCompoundInterestCompoundInterestCalculator implements Compou
                 amountOfResults = investmentPeriod.getYears();
                 periodContribution = calculationInput.monthlyContribution().multiply(new BigDecimal("12"));
             }
+            case SEMI_ANNUALLY -> {
+                amountOfResults = investmentPeriod.getYears() * 2;
+                periodContribution = calculationInput.monthlyContribution().multiply(new BigDecimal("6"));
+            }
+            case QUARTERLY -> {
+                amountOfResults = investmentPeriod.getYears() * 4;
+                periodContribution = calculationInput.monthlyContribution().multiply(new BigDecimal("3"));
+            }
+            case MONTHLY -> {
+                amountOfResults = investmentPeriod.getYears() * 12;
+                periodContribution = calculationInput.monthlyContribution();
+            }
             default -> {
                 LOGGER.warn("Defaulting to compound frequency: {}", Frequency.ANNUALLY.name());
                 amountOfResults = investmentPeriod.getYears();
@@ -44,16 +58,15 @@ public class DefaultCompoundInterestCompoundInterestCalculator implements Compou
         );
         calculationResults.add(startingPointResult);
 
-        BigDecimal interestRatePercentage = BigDecimal.valueOf(calculationInput.estimatedAnnualInterestRate() / 100);
-        BigDecimal base = initialInvestment.add(periodContribution);
-        calculateResults(calculationResults, interestRatePercentage, base, initialInvestment, BigDecimal.ZERO, periodContribution, amountOfResults);
+        BigDecimal interestRatePercentage = BigDecimal.valueOf(calculationInput.estimatedAnnualInterestRate()).divide(new BigDecimal("100"), MathContext.DECIMAL64);
+        calculateResults(calculationResults, interestRatePercentage, initialInvestment, BigDecimal.ZERO, periodContribution, amountOfResults);
 
         return calculationResults;
     }
 
-    private void calculateResults(List<CalculationResult> calculationResults, BigDecimal interestRatePercentage, BigDecimal base, BigDecimal result, BigDecimal accruedInterest, BigDecimal periodContribution, int amountOfResultsLeft) {
-        base = result.add(periodContribution);
-        result = base.multiply(interestRatePercentage).add(base);
+    private void calculateResults(List<CalculationResult> calculationResults, BigDecimal interestRatePercentage, BigDecimal result, BigDecimal accruedInterest, BigDecimal periodContribution, int amountOfResultsLeft) {
+        BigDecimal base = result.add(periodContribution);
+        result = base.multiply(interestRatePercentage).add(base).setScale(2, RoundingMode.HALF_UP);
         accruedInterest = accruedInterest.add(result.subtract(base));
 
         calculationResults.add(new CalculationResult(
@@ -64,7 +77,7 @@ public class DefaultCompoundInterestCompoundInterestCalculator implements Compou
         amountOfResultsLeft--;
 
         if (amountOfResultsLeft > 0) {
-            calculateResults(calculationResults, interestRatePercentage, base, result, accruedInterest, periodContribution, amountOfResultsLeft);
+            calculateResults(calculationResults, interestRatePercentage, result, accruedInterest, periodContribution, amountOfResultsLeft);
         }
     }
 }

@@ -8,7 +8,6 @@ public enum Frequency {
     ANNUALLY,
     SEMI_ANNUALLY,
     QUARTERLY,
-    MONTHLY,
-    DAILY
+    MONTHLY
 
 }
